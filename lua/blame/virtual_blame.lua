@@ -23,8 +23,8 @@ M.virtual_blame = function(blame_lines, config)
 			virt_text_pos = "right_align",
 			virt_text = {
 				{ line["author"]["value"], line["author"]["hl"] },
-				{ line["date"]["value"], line["date"]["hl"] },
-				{ line["hash"]["value"], line["hash"]["hl"] },
+				{ line["date"]["value"],   line["date"]["hl"] },
+				{ line["hash"]["value"],   line["hash"]["hl"] },
 			},
 		})
 	end
@@ -32,9 +32,15 @@ end
 
 local function should_skip(blames, index)
 	if index ~= 1 then
-		local hash = string.sub(blames[index]["hash"], 0, 8)
-		local prev_hash = string.sub(blames[index - 1]["hash"], 0, 8)
-		return hash == prev_hash
+		local hash = blames[index]["hash"];
+		local prev_hash = blames[index - 1]["hash"];
+		if hash == nil or prev_hash == nil then
+			return true
+		end
+
+		local short_hash = string.sub(hash, 0, 8)
+		local short_prev_hash = string.sub(prev_hash, 0, 8)
+		return short_hash == short_prev_hash
 	end
 	return false
 end
@@ -42,6 +48,9 @@ end
 M.create_lines = function(blame_lines, config)
 	local lines = {}
 	for i, value in ipairs(blame_lines) do
+		if value["hash"] == nil then
+			goto continue
+		end
 		local skip = false
 		if config.merge_consecutive then
 			skip = should_skip(blame_lines, i)
@@ -65,6 +74,7 @@ M.create_lines = function(blame_lines, config)
 				},
 			})
 		end
+		::continue::
 	end
 	return lines
 end

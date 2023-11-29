@@ -44,6 +44,9 @@ M.format_blame_to_line_string = function(blame_lines, config)
 		if next(value) == nil then
 			goto continue
 		end
+		if value["hash"] == nil then
+			goto continue
+		end
 		local formattedString = string.format(
 			"%-8s %-10s %s",
 			string.sub(value["hash"], 0, 8),

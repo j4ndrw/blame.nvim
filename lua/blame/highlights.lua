@@ -19,10 +19,14 @@ M.map_highlights_per_hash = function(parsed_lines)
 
 	for _, value in ipairs(parsed_lines) do
 		local full_hash = value["hash"]
+		if full_hash == nil then
+			goto continue
+		end
 		local hash = string.sub(full_hash, 0, 8)
 		if vim.fn.hlID(hash) == 0 then
 			vim.cmd("highlight " .. hash .. " guifg=" .. random_rgb())
 		end
+		::continue::
 	end
 end
 
